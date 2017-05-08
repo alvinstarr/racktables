@@ -1,0 +1,19 @@
+#!/bin/bash 
+
+while [ -z `pidof mysqld`"" ];
+do
+  sleep 5 
+done
+sleep 5 
+
+tablecheck=`mysqlshow --count  racktables_db | wc -l`
+
+if [ $tablecheck -lt 10 ]
+then 
+mysql -u root <<EOF
+
+CREATE DATABASE racktables_db DEFAULT CHARACTER SET = 'utf8';
+GRANT ALL ON racktables_db.* TO racktables_user@localhost IDENTIFIED BY 'racktables_password';
+EOF
+mysql -u root racktables_db < /usr/share/RackTables/init.sql
+fi
